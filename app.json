@@ -1,0 +1,26 @@
+{
+  "id": "13201a7f-47cc-49ef-a2ca-42be8c535bd7",
+  "name": "AL Translate Tool",
+  "publisher": "Bech-Andersen Consult ApS",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "14.0.0.0",
+  "application": "14.0.0.0",  
+  "idRanges": [
+    {
+      "from": 78600,
+      "to": 78649
+    }
+  ],
+  "contextSensitiveHelpUrl": "https://ALProject1.com/help/",
+  "showMyCode": true,
+  "runtime": "3.2"
+}
