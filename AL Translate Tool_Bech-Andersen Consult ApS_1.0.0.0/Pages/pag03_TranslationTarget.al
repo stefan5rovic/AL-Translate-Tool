@@ -44,12 +44,14 @@ page 78603 "BAC Translation Target List"
         {
             part(TransNotes; "BAC Translation Notes")
             {
+                ApplicationArea = All;
                 SubPageLink = "Project Code" = field("Project Code"),
                             "Trans-Unit Id" = field("Trans-Unit Id");
                 Editable = false;
             }
             part(TargetFactbox; "BAC Trans Target Factbox")
             {
+                ApplicationArea = All;
                 SubPageLink = "Project Code" = field("Project Code"),
                             "Trans-Unit Id" = field("Trans-Unit Id");
             }
@@ -72,17 +74,15 @@ page 78603 "BAC Translation Target List"
 
                 trigger OnAction();
                 var
-                    Project: Record "BAC Translation Project Name";
-                    TransTerm: Record "BAC Translation Term";
                     BACTranslationTarget: Record "BAC Translation Target";
                     BACGenTranslationTerm: Record "BAC Gen. Translation Term";
                     BACGenTranslationCheck: Record "BAC Gen. Translation Term";
                     BACGenTranslationLast: Record "BAC Gen. Translation Term";
                     LastLineNoL: Integer;
                 begin
-                    BACTranslationTarget.Reset;
+                    BACTranslationTarget.Reset();
                     CurrPage.SetSelectionFilter(BACTranslationTarget);
-                    IF BACTranslationTarget.FindSet then
+                    IF BACTranslationTarget.FindSet() then
                         repeat
                             IF BACTranslationTarget.Target = '' then
                                 Error('Nemate vrednost u polju %1, red ne može biti primenjen', FieldCaption(Target));
@@ -92,7 +92,7 @@ page 78603 "BAC Translation Target List"
                             BACGenTranslationCheck.SetRange(Term, BACTranslationTarget.Source);
                             IF BACGenTranslationCheck.FindFirst() then begin
                                 BACGenTranslationCheck.Translation := BACTranslationTarget.Target;
-                                BACGenTranslationCheck.Modify;
+                                BACGenTranslationCheck.Modify();
                                 Message('Već postoji red sa poljem %1 = %2, nije kreiran novi red već je ažuriran postojeći', BACGenTranslationCheck.FieldCaption(Term), Source);
                             end ELSE begin
                                 BACGenTranslationLast.Reset();
@@ -101,14 +101,14 @@ page 78603 "BAC Translation Target List"
                                 else
                                     LastLineNoL := 0;
 
-                                BACGenTranslationTerm.Init;
+                                BACGenTranslationTerm.Init();
                                 BACGenTranslationTerm."Line No." := LastLineNoL + 10000;
                                 BACGenTranslationTerm."Target Language" := BACTranslationTarget."Target Language";
                                 BACGenTranslationTerm.Term := BACTranslationTarget.Source;
                                 BACGenTranslationTerm.Translation := BACTranslationTarget.Target;
-                                BACGenTranslationTerm.Insert;
+                                BACGenTranslationTerm.Insert();
                             end;
-                        until BACTranslationTarget.Next = 0;
+                        until BACTranslationTarget.Next() = 0;
 
                 end;
             }
@@ -139,11 +139,11 @@ page 78603 "BAC Translation Target List"
                             TransTerm.SetRange("Project Code", BACTranslationTarget."Project Code");
                             TransTerm.SetRange("Target Language", BACTranslationTarget."Target Language");
                             TransTerm.SetRange(Term, BACTranslationTarget.Source);
-                            IF TransTerm.FindFIRST THEN begin
+                            IF TransTerm.FindFIRST() THEN begin
                                 BACTranslationTarget.Target := TransTerm.Translation;
-                                BACTranslationTarget.Modify;
+                                BACTranslationTarget.Modify();
                             end;
-                        until BACTranslationTarget.Next = 0;
+                        until BACTranslationTarget.Next() = 0;
                 end;
             }
             action("Translate")
@@ -157,8 +157,8 @@ page 78603 "BAC Translation Target List"
 
                 trigger OnAction();
                 var
-                    GoogleTranslate: Codeunit "BAC Google Translate Rest";
                     Project: Record "BAC Translation Project Name";
+                    GoogleTranslate: Codeunit "BAC Google Translate Rest";
                 begin
                     Project.get("Project Code");
                     Target := GoogleTranslate.Translate(Project."Source Language ISO code",
@@ -199,11 +199,11 @@ page 78603 "BAC Translation Target List"
                 PromotedOnly = true;
                 trigger OnAction()
                 var
-                    WarningTxt: Label 'Mark all untranslated lines to be translated?';
                     TransTarget: Record "BAC Translation Target";
+                    WarningTxt: Label 'Mark all untranslated lines to be translated?';
                 begin
                     CurrPage.SetSelectionFilter(TransTarget);
-                    if TransTarget.Count = 1 then
+                    if TransTarget.Count() = 1 then
                         TransTarget.Reset();
                     TransTarget.SetRange(Target, '');
                     if Confirm(WarningTxt) then
@@ -221,11 +221,11 @@ page 78603 "BAC Translation Target List"
                 PromotedOnly = true;
                 trigger OnAction()
                 var
-                    WarningTxt: Label 'Remove mark from all lines and disable translation?';
                     TransTarget: Record "BAC Translation Target";
+                    WarningTxt: Label 'Remove mark from all lines and disable translation?';
                 begin
                     CurrPage.SetSelectionFilter(TransTarget);
-                    if TransTarget.Count = 1 then
+                    if TransTarget.Count() = 1 then
                         TransTarget.Reset();
                     if Confirm(WarningTxt) then
                         TransTarget.ModifyAll(Translate, false);
@@ -241,11 +241,11 @@ page 78603 "BAC Translation Target List"
                 PromotedOnly = true;
                 trigger OnAction()
                 var
-                    WarningTxt: Label 'Remove all translations?';
                     TransTarget: Record "BAC Translation Target";
+                    WarningTxt: Label 'Remove all translations?';
                 begin
                     CurrPage.SetSelectionFilter(TransTarget);
-                    if TransTarget.Count = 1 then
+                    if TransTarget.Count() = 1 then
                         TransTarget.Reset();
                     if Confirm(WarningTxt) then
                         TransTarget.ModifyAll(Target, '');
@@ -271,10 +271,10 @@ page 78603 "BAC Translation Target List"
                 PromotedOnly = true;
                 trigger OnAction()
                 var
-                    WarningTxt: Label 'Export the Translation file?';
+                    TransProject: Record "BAC Translation Project Name";
                     ExportTranslation: XmlPort "BAC Export Translation Target";
                     ExportTranslation2018: XmlPort "BAC Export Trans Target 2018";
-                    TransProject: Record "BAC Translation Project Name";
+                    WarningTxt: Label 'Export the Translation file?';
                 begin
                     if Confirm(WarningTxt) then begin
                         TransProject.get("Project Code");
@@ -322,10 +322,10 @@ page 78603 "BAC Translation Target List"
 
     local procedure TranslateAll(inOnlyEmpty: Boolean)
     var
-        GoogleTranslate: Codeunit "BAC Google Translate Rest";
         TransTarget: Record "BAC Translation Target";
         TransTarget2: Record "BAC Translation Target";
         Project: Record "BAC Translation Project Name";
+        GoogleTranslate: Codeunit "BAC Google Translate Rest";
         Window: Dialog;
         DialogTxt: Label 'Converting #1###### of #2######';
         Counter: Integer;
@@ -336,7 +336,7 @@ page 78603 "BAC Translation Target List"
         TransTarget.SetRange(Translate, true);
         TransTarget.SetRange("Project Code", "Project Code");
         Project.get("Project Code");
-        TotalCount := TransTarget.Count;
+        TotalCount := TransTarget.Count();
         TransTarget.SetRange(Occurrencies, 1);
         if TransTarget.FindSet() then begin
             Window.Open(DialogTxt);
@@ -361,7 +361,7 @@ page 78603 "BAC Translation Target List"
         TransTarget.SetRange("Project Code", "Project Code");
         TransTarget.SetCurrentKey(Source);
         TransTarget.SetFilter(Occurrencies, '>1');
-        if TransTarget.FindSet() then begin
+        if TransTarget.FindSet() then
             repeat
                 Counter += 1;
                 Window.Update(1, Counter);
@@ -377,7 +377,6 @@ page 78603 "BAC Translation Target List"
                 SelectLatestVersion();
                 TransTarget.SetFilter(Source, '<>%1', TransTarget.Source);
             until TransTarget.Next() = 0;
-        end;
 
     end;
 

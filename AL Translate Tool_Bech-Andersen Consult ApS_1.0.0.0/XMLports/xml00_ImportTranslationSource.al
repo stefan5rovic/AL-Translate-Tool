@@ -10,7 +10,7 @@ xmlport 78600 "BAC Import Translation Source"
     PreserveWhiteSpace = true;
     UseDefaultNamespace = true;
     UseRequestPage = false;
-    UseLax=true;
+    UseLax = true;
 
     schema
     {
@@ -134,10 +134,11 @@ xmlport 78600 "BAC Import Translation Source"
     }
 
     var
-        ProjectCode: Code[10];
-        MissingProjNameTxt: Label 'Project Name is Missing';
         TransNotes: Record "BAC Translation Notes";
         TransProject: Record "BAC Translation Project Name";
+
+        ProjectCode: Code[10];
+        MissingProjNameTxt: Label 'Project Name is Missing';
 
     trigger OnPostXmlPort()
     begin

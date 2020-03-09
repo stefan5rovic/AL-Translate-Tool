@@ -97,7 +97,7 @@ xmlport 78604 "BAC Export Trans Target 2018"
                             tableelement(note; "BAC Translation Notes")
                             {
                                 LinkTable = Target;
-                                LinkFields = "Project Code" = field ("Project Code"), "Trans-Unit Id" = field ("Trans-Unit Id");
+                                LinkFields = "Project Code" = field("Project Code"), "Trans-Unit Id" = field("Trans-Unit Id");
 
                                 fieldattribute(from; note.From)
                                 {
@@ -113,42 +113,6 @@ xmlport 78604 "BAC Export Trans Target 2018"
 
                                 }
                             }
-
-                            /*textelement(note)
-                            {
-                                trigger OnAfterAssignVariable()
-                                begin
-                                    
-                                end;
-                                   textattribute(from)
-                                    {
-                                        trigger OnBeforePassVariable()
-                                        begin
-                                            from := note.From;
-                                        end;
-                                    }
-                                    textattribute(annotates)
-                                    {
-                                        trigger OnBeforePassVariable()
-                                        begin
-                                            annotates := note.Annotates;
-                                        end;
-                                    }
-                                    textattribute(priority)
-                                    {
-                                        trigger OnBeforePassVariable()
-                                        begin
-                                            priority := note.Priority;
-                                        end;
-
-                                    }
-                                    trigger OnBeforePassField()
-                                    var
-                                        myInt: Integer;
-                                    begin
-                                        note.Note := 'HEllo World';
-                                    end;
-                            }*/
 
                             fieldelement(Target; Target.Target)
                             {
@@ -167,7 +131,6 @@ xmlport 78604 "BAC Export Trans Target 2018"
         ProjectCode: Code[10];
         SourceTransCode: Text[10];
         TargetTransCode: Text[10];
-        MissingProjNameTxt: Label 'Project Name is Missing';
 
     trigger OnPreXmlPort()
     var

@@ -122,7 +122,7 @@ table 78600 "BAC Translation Project Name"
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         "Created By" := copystr(UserId(), 1, MaxStrLen(("Created By")));
-        "Creation Date" := Today;
+        "Creation Date" := Today();
         if "Project Code" = '' then begin
             TransSetup.get();
             TransSetup.TestField("Project Nos.");
@@ -160,7 +160,7 @@ table 78600 "BAC Translation Project Name"
     begin
         with TransProject do begin
             TransProject := Rec;
-            TransSetup.get;
+            TransSetup.get();
             TransSetup.TestField("Project Nos.");
             if NoSeriesMgt.SelectSeries(TransSetup."Project Nos.", xRec."No. Series", "No. Series") then begin
                 NoSeriesMgt.SetSeries("Project Code");

@@ -18,8 +18,8 @@ page 78600 "BAC Trans Project List"
                     AssistEdit = true;
                     trigger OnAssistEdit();
                     begin
-                        if AssistEdit then
-                            CurrPage.Update;
+                        if AssistEdit() then
+                            CurrPage.Update();
                     end;
 
                 }
@@ -72,16 +72,16 @@ page 78600 "BAC Trans Project List"
 
                 trigger OnAction()
                 var
-                    ImportSourceXML: XmlPort "BAC Import Translation Source";
-                    ImportSource2018XML: XmlPort "BAC Import Trans. Source 2018";
                     TransSource: Record "BAC Translation Source";
                     TransNotes: Record "BAC Translation Notes";
-                    DeleteWarningTxt: Label 'This will overwrite the Translation source for %1';
                     TransProject: Record "BAC Translation Project Name";
+                    ImportSourceXML: XmlPort "BAC Import Translation Source";
+                    ImportSource2018XML: XmlPort "BAC Import Trans. Source 2018";
+                    DeleteWarningTxt: Label 'This will overwrite the Translation source for %1';
                     ImportedTxt: Label 'The file %1 has been imported into project %2';
                 begin
                     TransSource.SetRange("Project Code", "Project Code");
-                    if not TransSource.IsEmpty then
+                    if not TransSource.IsEmpty() then
                         if Confirm(DeleteWarningTxt, false, "Project Code") then begin
                             TransSource.DeleteAll();
                             TransNotes.DeleteAll();
@@ -101,6 +101,20 @@ page 78600 "BAC Trans Project List"
                     end;
                     TransProject.Get("Project Code");
                     message(ImportedTxt, TransProject."File Name", "Project Code");
+                end;
+            }
+
+            action(ImportSrcFromText)
+            {
+                ApplicationArea = All;
+                Caption = 'Import Source From Text';
+                Image = ImportCodes;
+                Promoted = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                begin
+                    ImportSourceFromText();
                 end;
             }
         }
@@ -128,6 +142,54 @@ page 78600 "BAC Trans Project List"
                               "Source Language" = field("Source Language"),
                               "Source Language ISO code" = field("Source Language ISO code");
             }
+
+
         }
     }
+    procedure ImportSourceFromText()
+    var
+        TransSource: Record "BAC Translation Source";
+        TransNotes: Record "BAC Translation Notes";
+        //TransProject: Record "BAC Translation Project Name";
+        Language: Record Language;
+        InStream: InStream;
+        LineNo: Integer;
+        DeleteWarningTxt: Label 'This will overwrite the Translation source for %1';
+        ImportedTxt: Label 'The file %1 has been imported into project %2';
+        FileName: Text;
+        TextLine: Text;
+        RightPart: Text;
+        LeftPart: Text;
+    begin
+        TransSource.SetRange("Project Code", "Project Code");
+        if not TransSource.IsEmpty() then
+            if Confirm(DeleteWarningTxt, false, "Project Code") then begin
+                TransSource.DeleteAll();
+                TransNotes.DeleteAll();
+            end else
+                exit;
+
+        if UploadIntoStream('', '', 'All Files (*.*)|*.*', FileName, InStream) then
+            while InStream.ReadText(TextLine) > 0 do begin
+                LineNo += 1;
+                LeftPart := COPYSTR(TextLine, 1, STRPOS(TextLine, ':') - 1);
+                RightPart := COPYSTR(TextLine, STRPOS(TextLine, ':') + 1);
+                //TransProject.Get("Project Code");
+                Language.Get("Source Language");
+                if StrContains(LeftPart, format(Language."Windows Language ID")) then begin
+                    TransSource."Line No." := LineNo;
+                    TransSource."Project Code" := "Project Code";
+                    TransSource."Trans-Unit Id" := LeftPart;
+                    TransSource.Source := RightPart;
+                    TransSource.Insert();
+                end;
+            end;
+    end;
+
+    local procedure StrContains(String: Text; CompareString: Text) Contains: boolean
+    begin
+        if StrPos(String, CompareString) > 0 then
+            exit(true);
+        exit(false)
+    end;
 }

@@ -47,12 +47,12 @@ table 78602 "BAC Translation Target"
             Caption = 'Target';
             trigger OnValidate()
             var
-                Instances: Integer;
                 TransTarget: Record "BAC Translation Target";
+                Instances: Integer;
                 QuestionTxt: Label 'Copy the Target to all other instances?';
             begin
                 TransTarget.SetRange(Source, Source);
-                Instances := TransTarget.Count;
+                Instances := TransTarget.Count();
                 if Target = '' then
                     exit;
                 if Instances > 1 then begin
@@ -97,7 +97,7 @@ table 78602 "BAC Translation Target"
         {
             Caption = 'Occurrencies';
             FieldClass = FlowField;
-            CalcFormula = count ("BAC Translation Target" where (Source = field (Source)));
+            CalcFormula = count ("BAC Translation Target" where(Source = field(Source)));
         }
 
     }

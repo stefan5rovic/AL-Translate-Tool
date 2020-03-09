@@ -87,12 +87,12 @@ report 78600 "ImportGeneralTranslationTerms"
     trigger OnPostReport();
     begin
         MESSAGE(ImportSuccessfulTxt);
-        ExcelBufferG.DELETEALL;
+        ExcelBufferG.DELETEALL();
     end;
 
     trigger OnPreReport();
     begin
-        ExcelBufferG.DELETEALL;
+        ExcelBufferG.DELETEALL();
 
         ExcelBufferG.OpenBook(ServerFileNameG, SheetNameG);
         ExcelBufferG.ReadSheet();
@@ -112,7 +112,6 @@ report 78600 "ImportGeneralTranslationTerms"
         ProcessingDataTxt: TextConst ENU = 'Importing entris from Excel...\', SRM = 'Uvoz stavki iz Excela...\';
         StatusTxt: TextConst ENU = 'Status:             @1@@@@@@@@@@@@', SRM = 'Status:             @1@@@@@@@@@@@@';
         ImportSuccessfulTxt: TextConst ENU = 'Import successfull', SRM = 'Uvoz stavki uspešan';
-        ItemNoG: Code[20];
 
     local procedure RequestFile();
     begin
@@ -142,46 +141,43 @@ report 78600 "ImportGeneralTranslationTerms"
 
     procedure ImportDataFromExcel();
     var
+        GenTransTermLastL: Record "BAC Gen. Translation Term";
+        GenTransTermCheckL: Record "BAC Gen. Translation Term";
+        GenTransTermL: Record "BAC Gen. Translation Term";
         ProcessPercentL: Decimal;
         NumberOfRowsL: Integer;
         NextUpdateTimeL: Time;
         LineNoL: Integer;
-        ManufacturerItemNoL: Code[50];
-        QuantityPerL: Decimal;
-        GenTransTermLastL: Record "BAC Gen. Translation Term";
-        GenTransTermCheckL: Record "BAC Gen. Translation Term";
-        GenTransTermL: Record "BAC Gen. Translation Term";
         RowNoL: Integer;
-        LastRowNoL: Integer;
         TermL: Text;
         TranslationL: Text;
     begin
         WindowDialogG.OPEN(ProcessingDataTxt + StatusTxt);
-        NextUpdateTimeL := TIME + 1000;
+        NextUpdateTimeL := TIME() + 1000;
 
-        IF ExcelBufferG.FINDLAST THEN
+        IF ExcelBufferG.FINDLAST() THEN
             NumberOfRowsL := ExcelBufferG."Row No.";
 
-        GenTransTermLastL.RESET;
+        GenTransTermLastL.RESET();
         GenTransTermLastL.SetRange("Target Language", TargetLanguageG);
-        IF GenTransTermLastL.FINDLAST THEN
+        IF GenTransTermLastL.FINDLAST() THEN
             LineNoL := GenTransTermLastL."Line No."
         ELSE
             LineNoL := 0;
 
-        ExcelBufferG.RESET;
+        ExcelBufferG.RESET();
         //ExcelBufferG.SETRANGE("Column No.", 4);
         //ExcelBufferG.SETFILTER("Row No.", '%1..', 2);
         //RowNoL := 1;
 
-        IF ExcelBufferG.FINDSET THEN
+        IF ExcelBufferG.FINDSET() THEN
             REPEAT
-                IF ExcelBufferG."Column No." = 1 THEN BEGIN
-                    TermL := ExcelBufferG."Cell Value as Text";
-                end else begin
+                IF ExcelBufferG."Column No." = 1 THEN
+                    TermL := ExcelBufferG."Cell Value as Text"
+                else begin
                     TranslationL := ExcelBufferG."Cell Value as Text";
 
-                    GenTransTermCheckL.Reset;
+                    GenTransTermCheckL.Reset();
                     GenTransTermCheckL.SetRange(Term, TermL);
                     IF GenTransTermCheckL.FindFirst() THEN begin
                         IF GenTransTermCheckL.Translation <> TranslationL THEN BEGIN
@@ -203,19 +199,19 @@ report 78600 "ImportGeneralTranslationTerms"
 
                 RowNoL += 1;
                 ProcessPercentL := RowNoL / NumberOfRowsL;
-                IF (TIME > NextUpdateTimeL) AND (ProcessPercentL > 0) THEN BEGIN
+                IF (TIME() > NextUpdateTimeL) AND (ProcessPercentL > 0) THEN BEGIN
                     WindowDialogG.UPDATE(1, ROUND(ProcessPercentL * 10000, 1));
-                    NextUpdateTimeL := TIME + 1000;
+                    NextUpdateTimeL := TIME() + 1000;
                 END;
 
-            UNTIL ExcelBufferG.NEXT = 0;
+            UNTIL ExcelBufferG.NEXT() = 0;
 
 
         WindowDialogG.UPDATE(1, 10000);
 
         SLEEP(500);
 
-        WindowDialogG.CLOSE;
+        WindowDialogG.CLOSE();
 
     end;
 

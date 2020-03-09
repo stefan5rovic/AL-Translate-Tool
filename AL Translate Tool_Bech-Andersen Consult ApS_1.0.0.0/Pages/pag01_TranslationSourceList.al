@@ -25,8 +25,9 @@ page 78601 "BAC Translation Source List"
         {
             part(TransNotes; "BAC Translation Notes")
             {
-                SubPageLink = "Project Code" = field ("Project Code"),
-                            "Trans-Unit Id" = field ("Trans-Unit Id");
+                ApplicationArea = All;
+                SubPageLink = "Project Code" = field("Project Code"),
+                            "Trans-Unit Id" = field("Trans-Unit Id");
             }
 
         }

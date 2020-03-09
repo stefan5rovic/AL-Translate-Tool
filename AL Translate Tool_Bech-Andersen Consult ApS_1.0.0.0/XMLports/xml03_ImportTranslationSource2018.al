@@ -134,18 +134,17 @@ xmlport 78603 "BAC Import Trans. Source 2018"
     }
 
     var
-        ProjectCode: Code[10];
-        MissingProjNameTxt: Label 'Project Name is Missing';
         TransNotes: Record "BAC Translation Notes";
         TransProject: Record "BAC Translation Project Name";
-        DummyMaxWidth: Text;
+        ProjectCode: Code[10];
+        MissingProjNameTxt: Label 'Project Name is Missing';
 
     trigger OnPostXmlPort()
     begin
         with TransProject do begin
-            "File Name" := currXMLport.Filename();
+            "File Name" := CopyStr(currXMLport.Filename(), 1, MaxStrLen("File Name"));
             while (StrPos("File Name", '\') > 0) do
-                "File Name" := CopyStr("File Name", StrPos("File Name", '\') + 1);
+                "File Name" := CopyStr("File Name", StrPos("File Name", '\') + 1, MaxStrLen("File Name"));
             Modify();
         end;
     end;

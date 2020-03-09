@@ -60,8 +60,6 @@ page 78608 "BAC Gen. Translation Terms"
 
                 trigger OnAction();
                 var
-                    GenTransTerm: Record "BAC Gen. Translation Term";
-                    TransTerm: Record "BAC Translation Term";
                     ImportGeneralTranslationTermsRepL: Report "ImportGeneralTranslationTerms";
                 begin
                     IF LanguageFilter = '' THEN
@@ -76,7 +74,6 @@ page 78608 "BAC Gen. Translation Terms"
     }
 
     var
-        Language: Record Language;
         LanguageFilter: Code[10];
 
 }

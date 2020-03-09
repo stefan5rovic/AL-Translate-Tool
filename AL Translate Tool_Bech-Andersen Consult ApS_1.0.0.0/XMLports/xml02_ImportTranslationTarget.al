@@ -139,15 +139,14 @@ xmlport 78602 "BAC Import Translation Target"
     }
 
     var
+        TransNotes: Record "BAC Translation Notes";
+        TargetLanguage: Record "BAC Target Language";
+        TransProject: Record "BAC Translation Project Name";
+        MissingProjNameTxt: Label 'Project Name is Missing';
         ProjectCode: Code[10];
         TargetLangCode: Code[10];
         TargetLangISOCode: Text[10];
         SourceLangISOCode: Text[10];
-        MissingProjNameTxt: Label 'Project Name is Missing';
-        TransNotes: Record "BAC Translation Notes";
-        TargetLanguage: Record "BAC Target Language";
-        TransTarget: Record "BAC Translation Target";
-        TransProject: Record "BAC Translation Project Name";
 
     procedure SetProjectCode(inProjectCode: Code[10]; inSourceLangISOCode: text[10]; inTargetLangISOCode: Text[10])
     begin
@@ -157,7 +156,7 @@ xmlport 78602 "BAC Import Translation Target"
         SourceLangISOCode := inSourceLangISOCode;
         TargetLanguage.Setrange("Project Code", ProjectCode);
         TargetLanguage.Setrange("Target Language ISO code", TargetLangISOCode);
-        TargetLanguage.findfirst;
+        TargetLanguage.findfirst();
         TargetLangCode := TargetLanguage."Target Language";
     end;
 
@@ -175,7 +174,7 @@ xmlport 78602 "BAC Import Translation Target"
 
     procedure GetFileName(): Text;
     begin
-        exit(currXMLport.Filename);
+        exit(currXMLport.Filename());
     end;
 }
 

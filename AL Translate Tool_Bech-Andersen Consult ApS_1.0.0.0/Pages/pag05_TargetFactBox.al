@@ -29,6 +29,6 @@ page 78605 "BAC Trans Target Factbox"
         TransTarget: Record "BAC Translation Target";
     begin
         TransTarget.SetRange(Source, Source);
-        Instances := TransTarget.Count;
+        Instances := TransTarget.Count();
     end;
 }

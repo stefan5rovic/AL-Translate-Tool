@@ -3,17 +3,15 @@ codeunit 78600 "BAC Google Translate Rest"
     procedure Translate(inSourceLang: Text[10]; inTargetLang: Text[10]; inText: Text[2048]) outTransText: text[2048]
     var
         EndPoint: Text;
-        TokenName: Text[50];
-        Headers: HttpHeaders;
     begin
-        HttpClient.DefaultRequestHeaders.Add('User-Agent', 'Dynamics 365');
+        HttpClient.DefaultRequestHeaders().Add('User-Agent', 'Dynamics 365');
         EndPoint := 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=%1&tl=%2&dt=t&q=%3';
         EndPoint := StrSubstNo(EndPoint, inSourceLang, inTargetLang, inText);
         if not HttpClient.Get(EndPoint, ResponseMessage) then
             Error('The call to the web service failed.');
-        if not ResponseMessage.IsSuccessStatusCode then
-            error('The web service returned an error message:\\' + 'Status code: %1\' + 'Description: %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
-        ResponseMessage.Content.ReadAs(TransText);
+        if not ResponseMessage.IsSuccessStatusCode() then
+            error('The web service returned an error message:\\' + 'Status code: %1\' + 'Description: %2', ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase());
+        ResponseMessage.Content().ReadAs(TransText);
         outTransText := GetLines(TransText);
     end;
 
@@ -37,7 +35,4 @@ codeunit 78600 "BAC Google Translate Rest"
         HttpClient: HttpClient;
         ResponseMessage: HttpResponseMessage;
         TransText: text;
-        CurrencyRate: Record "Currency Exchange Rate" temporary;
-        Currency: Record Currency;
-        InvExchRate: Decimal;
 }

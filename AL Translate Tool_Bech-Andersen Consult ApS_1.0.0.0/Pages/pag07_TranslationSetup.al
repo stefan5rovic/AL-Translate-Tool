@@ -45,6 +45,7 @@ page 78607 "BAC Translation Setup"
         {
             part(Logo; "BAC AL Logo FactBox")
             {
+                ApplicationArea = All;
             }
         }
     }
@@ -55,6 +56,7 @@ page 78607 "BAC Translation Setup"
         {
             action("About Al Translation Tool")
             {
+                ApplicationArea = All;
                 RunObject = page "BAC About AL Translation Tool";
                 Image = AboutNav;
                 Promoted = true;

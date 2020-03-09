@@ -51,9 +51,9 @@ page 78609 "BAC About AL Translation Tool"
     trigger OnOpenPage()
     begin
         if NavApp.GetCurrentModuleInfo(AppModuleInfo) then begin
-            AppVersion := format(AppModuleInfo.AppVersion);
-            AppName := AppModuleInfo.Name;
-            AppPublisher := AppModuleInfo.Publisher;
+            AppVersion := format(AppModuleInfo.AppVersion());
+            AppName := AppModuleInfo.Name();
+            AppPublisher := AppModuleInfo.Publisher();
         end;
     end;
 }
