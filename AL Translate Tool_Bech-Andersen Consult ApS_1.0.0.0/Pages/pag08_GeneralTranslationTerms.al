@@ -13,14 +13,15 @@ page 78608 "BAC Gen. Translation Terms"
         {
             group(Language)
             {
-                field(LanguageFilter; LanguageFilter)
+                field(LanguageFilter; LangFilter)
                 {
                     Caption = 'Language Filter';
+                    ApplicationArea = All;
                     TableRelation = Language where("BAC ISO code" = filter('<>'''''));
                     trigger OnValidate()
                     begin
-                        if LanguageFilter <> '' then
-                            SetFilter("Target Language", LanguageFilter)
+                        if LangFilter <> '' then
+                            SetFilter("Target Language", LangFilter)
                         else
                             SetRange("Target Language");
                         CurrPage.Update(false);
@@ -53,19 +54,20 @@ page 78608 "BAC Gen. Translation Terms"
         {
             action("Import From Excel (Term, Translation)")
             {
-                //RunObject = report "ImportGeneralTranslationTerms";
+                ApplicationArea = All;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
+                Image = Import;
 
                 trigger OnAction();
                 var
                     ImportGeneralTranslationTermsRepL: Report "ImportGeneralTranslationTerms";
                 begin
-                    IF LanguageFilter = '' THEN
+                    IF LangFilter = '' THEN
                         Error('You have to choose Language Filter!')
                     ELSE BEGIN
-                        ImportGeneralTranslationTermsRepL.SetTargetLanguageG(LanguageFilter);
+                        ImportGeneralTranslationTermsRepL.SetTargetLanguageG(LangFilter);
                         ImportGeneralTranslationTermsRepL.Run();
                     end;
                 end;
@@ -74,6 +76,6 @@ page 78608 "BAC Gen. Translation Terms"
     }
 
     var
-        LanguageFilter: Code[10];
+        LangFilter: Code[10];
 
 }

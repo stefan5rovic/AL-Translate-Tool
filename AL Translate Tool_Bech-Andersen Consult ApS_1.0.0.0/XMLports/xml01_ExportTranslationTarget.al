@@ -72,6 +72,11 @@ xmlport 78601 "BAC Export Translation Target"
                             fieldattribute(id; Target."Trans-Unit Id")
                             {
                             }
+
+                            fieldattribute("maxWidth"; Target."Max Width")
+                            {
+                                Occurrence = Optional;
+                            }
                             textattribute("size-unit")
                             {
                                 trigger OnBeforePassVariable()
@@ -94,7 +99,7 @@ xmlport 78601 "BAC Export Translation Target"
                             tableelement(note; "BAC Translation Notes")
                             {
                                 LinkTable = Target;
-                                LinkFields = "Project Code" = field ("Project Code"), "Trans-Unit Id" = field ("Trans-Unit Id");
+                                LinkFields = "Project Code" = field("Project Code"), "Trans-Unit Id" = field("Trans-Unit Id");
 
                                 fieldattribute(from; note.From)
                                 {

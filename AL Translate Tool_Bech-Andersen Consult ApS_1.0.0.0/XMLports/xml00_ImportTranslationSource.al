@@ -71,6 +71,10 @@ xmlport 78600 "BAC Import Translation Source"
                             fieldattribute(id; Source."Trans-Unit Id")
                             {
                             }
+                            fieldattribute("maxWidth"; Source."Max Width")
+                            {
+                                Occurrence = Optional;
+                            }
                             textattribute("size-unit")
                             {
                                 trigger OnAfterAssignVariable()
@@ -143,9 +147,9 @@ xmlport 78600 "BAC Import Translation Source"
     trigger OnPostXmlPort()
     begin
         with TransProject do begin
-            "File Name" := currXMLport.Filename();
+            "File Name" := CopyStr(currXMLport.Filename(), 1, MaxStrLen("File Name"));
             while (StrPos("File Name", '\') > 0) do
-                "File Name" := CopyStr("File Name", StrPos("File Name", '\') + 1);
+                "File Name" := CopyStr("File Name", StrPos("File Name", '\') + 1, MaxStrLen("File Name"));
             Modify();
         end;
     end;

@@ -53,7 +53,7 @@ page 78606 "BAC Translation Terms"
                     if GenTransTerm.FindSet() then
                         repeat
                             TransTerm.TransferFields(GenTransTerm);
-                            TransTerm."Project Code" := GetFilter("Project Code");
+                            TransTerm."Project Code" := CopyStr(GetFilter("Project Code"), 1, MaxStrLen(TransTerm."Project Code"));
                             if TransTerm.Insert() then;
                         until GenTransTerm.Next() = 0;
                 end;

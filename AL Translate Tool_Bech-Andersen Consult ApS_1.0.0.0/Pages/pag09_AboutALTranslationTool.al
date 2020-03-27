@@ -27,12 +27,12 @@ page 78609 "BAC About AL Translation Tool"
                         ApplicationArea = All;
                         Editable = false;
                     }
-                    field(AppName; AppName)
+                    field(AppName; ApplicationName)
                     {
                         ApplicationArea = All;
                         Editable = false;
                     }
-                    field(AppPublisher; AppPublisher)
+                    field(AppPublisher; ApplicationPublisher)
                     {
                         ApplicationArea = All;
                         Editable = false;
@@ -44,16 +44,16 @@ page 78609 "BAC About AL Translation Tool"
 
     var
         AppVersion: Text[10];
-        AppName: Text;
-        AppPublisher: Text;
+        ApplicationName: Text;
+        ApplicationPublisher: Text;
         AppModuleInfo: ModuleInfo;
 
     trigger OnOpenPage()
     begin
         if NavApp.GetCurrentModuleInfo(AppModuleInfo) then begin
             AppVersion := format(AppModuleInfo.AppVersion());
-            AppName := AppModuleInfo.Name();
-            AppPublisher := AppModuleInfo.Publisher();
+            ApplicationName := AppModuleInfo.Name();
+            ApplicationPublisher := AppModuleInfo.Publisher();
         end;
     end;
 }

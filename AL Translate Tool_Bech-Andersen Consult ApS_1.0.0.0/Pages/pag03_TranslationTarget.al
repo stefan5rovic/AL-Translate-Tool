@@ -33,11 +33,11 @@ page 78603 "BAC Translation Target List"
                     ApplicationArea = All;
                     ToolTip = 'Enter the translated text';
                 }
-                field(Occurrencies; Occurrencies)
+                /*field(Occurrencies; Occurrencies)
                 {
                     Visible = false;
                     ApplicationArea = All;
-                }
+                }*/
             }
         }
         area(Factboxes)
@@ -64,6 +64,18 @@ page 78603 "BAC Translation Target List"
     {
         area(Processing)
         {
+            action(CopyFromSource)
+            {
+                ApplicationArea = All;
+                Image = Copy;
+                Caption = 'Copy from Source';
+                Promoted = true;
+
+                trigger OnAction()
+                begin
+                    TransferSourceToTarget();
+                end;
+            }
             action("GoPro Send Line To Gen. Translation Terms")
             {
                 ApplicationArea = All;
@@ -294,6 +306,20 @@ page 78603 "BAC Translation Target List"
                 end;
 
             }
+
+            action("Export Translation to Text")
+            {
+                ApplicationArea = All;
+                Caption = 'Export Translation File to Text';
+                Image = ExportFile;
+                Promoted = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                begin
+                    ExportTargetToText();
+                end;
+            }
         }
     }
     var
@@ -303,19 +329,36 @@ page 78603 "BAC Translation Target List"
 
     trigger OnOpenPage()
     var
-        TransSource: Record "BAC Translation Source";
-        TransTarget: Record "BAC Translation Target";
+        //TransSource: Record "BAC Translation Source";
+        //TransTarget: Record "BAC Translation Target";
         TransSetup: Record "BAC Translation Setup";
     begin
         TransSetup.get();
         ShowTranslate := TransSetup."Use Free Google Translate";
 
+        //TransSource.SetFilter("Project Code", GetFilter("Project Code"));
+        if IsEmpty() then
+            TransferSourceToTarget();
+        /*if TransSource.FindSet() then
+            repeat
+                TransTarget.TransferFields(TransSource);
+                TransTarget."Target Language" := CopyStr(GetFilter("Target Language"), 1, MaxStrLen(TransTarget."Target Language"));
+                TransTarget."Target Language ISO code" := CopyStr(GetFilter("Target Language ISO code"), 1, MaxStrLen(TransTarget."Target Language ISO code"));
+                if TransTarget.Insert() then;
+            until TransSource.Next() = 0;*/
+    end;
+
+    local procedure TransferSourceToTarget()
+    var
+        TransSource: Record "BAC Translation Source";
+        TransTarget: Record "BAC Translation Target";
+    begin
         TransSource.SetFilter("Project Code", GetFilter("Project Code"));
         if TransSource.FindSet() then
             repeat
                 TransTarget.TransferFields(TransSource);
-                TransTarget."Target Language" := GetFilter("Target Language");
-                TransTarget."Target Language ISO code" := GetFilter("Target Language ISO code");
+                TransTarget."Target Language" := CopyStr(GetFilter("Target Language"), 1, MaxStrLen(TransTarget."Target Language"));
+                TransTarget."Target Language ISO code" := CopyStr(GetFilter("Target Language ISO code"), 1, MaxStrLen(TransTarget."Target Language ISO code"));
                 if TransTarget.Insert() then;
             until TransSource.Next() = 0;
     end;
@@ -380,7 +423,7 @@ page 78603 "BAC Translation Target List"
 
     end;
 
-    local procedure ReplaceTermInTranslation(inTarget: Text[250]) outTarget: Text[250]
+    local procedure ReplaceTermInTranslation(inTarget: Text) outTarget: Text[2048]
     var
         TransTerm: Record "BAC Translation Term";
         StartPos: Integer;
@@ -411,6 +454,48 @@ page 78603 "BAC Translation Target List"
                     inTarget := outTarget;
             until TransTerm.Next() = 0;
         if not Found then
-            outTarget := inTarget;
+            outTarget := CopyStr(inTarget, 1, MaxStrLen(outTarget));
+    end;
+
+    local procedure ExportTargetToText()
+    var
+        TransTarger: Record "BAC Translation Target";
+        TransLanguage: Record "BAC Target Language";
+        Language: Record Language;
+        TmpBlob: Record TempBlob temporary;
+        InStream: InStream;
+        OutStream: OutStream;
+        ProgressWindow: Dialog;
+        FileName: Text;
+        SourceLanguageID: Text;
+        TargetLanguageID: Text;
+        OutputString: Text;
+    begin
+        TransTarger.CopyFilters(Rec);
+        TmpBlob.Blob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        Language.Get(GetFilter("Target Language"));
+        TargetLanguageID := 'A' + Format(Language."Windows Language ID");
+        TransLanguage.Get(GetFilter("Project Code"), GetFilter("Target Language"));
+        Language.Get(TransLanguage."Source Language");
+        SourceLanguageID := 'A' + Format(Language."Windows Language ID");
+        FileName := 'Translation_' + GetFilter("Project Code") + '_' + GetFilter("Target Language") + '.txt';
+        ProgressWindow.Open('Exporting line no. #1######');
+        If TransTarger.FindSet() then
+            repeat
+                ProgressWindow.Update(1, TransTarger."Line No.");
+                OutputString := '';
+                OutputString += TransTarger."Trans-Unit Id";
+                OutputString := OutputString.Replace(SourceLanguageID, TargetLanguageID);
+                if OutputString.EndsWith('L128') then begin
+                    OutputString := CopyStr(OutputString, 1, StrLen(OutputString) - 4);
+                    OutputString += TargetLanguageID + '-L999';
+                end;
+                OutputString += ':' + TransTarger.Target;
+                OutStream.WriteText(OutputString);
+                OutStream.WriteText();
+            until TransTarger.Next() = 0;
+        ProgressWindow.Close();
+        TmpBlob.Blob.CreateInStream(InStream, TextEncoding::UTF8);
+        DownloadFromStream(InStream, '', '', 'All Files (*.*)|*.*', FileName);
     end;
 }

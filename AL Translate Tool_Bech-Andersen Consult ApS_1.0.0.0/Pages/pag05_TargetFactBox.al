@@ -12,7 +12,7 @@ page 78605 "BAC Trans Target Factbox"
             group(GroupName)
             {
                 ShowCaption = false;
-                field(Instances; Instances)
+                field(Instances; Counter)
                 {
                     Caption = 'Instances';
                     ApplicationArea = All;
@@ -22,13 +22,13 @@ page 78605 "BAC Trans Target Factbox"
     }
 
     var
-        Instances: Integer;
+        Counter: Integer;
 
     trigger OnAfterGetRecord()
     var
         TransTarget: Record "BAC Translation Target";
     begin
         TransTarget.SetRange(Source, Source);
-        Instances := TransTarget.Count();
+        Counter := TransTarget.Count();
     end;
 }

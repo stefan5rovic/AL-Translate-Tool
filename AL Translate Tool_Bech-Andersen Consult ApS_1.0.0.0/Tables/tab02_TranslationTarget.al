@@ -108,5 +108,6 @@ table 78602 "BAC Translation Target"
         {
             Clustered = true;
         }
+
     }
 }

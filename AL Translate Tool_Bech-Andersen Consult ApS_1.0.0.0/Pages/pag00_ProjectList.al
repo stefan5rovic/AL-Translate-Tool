@@ -142,8 +142,6 @@ page 78600 "BAC Trans Project List"
                               "Source Language" = field("Source Language"),
                               "Source Language ISO code" = field("Source Language ISO code");
             }
-
-
         }
     }
     procedure ImportSourceFromText()
@@ -155,13 +153,12 @@ page 78600 "BAC Trans Project List"
         InStream: InStream;
         LineNo: Integer;
         DeleteWarningTxt: Label 'This will overwrite the Translation source for %1';
-        ImportedTxt: Label 'The file %1 has been imported into project %2';
         FileName: Text;
         TextLine: Text;
         RightPart: Text;
         LeftPart: Text;
     begin
-        TransSource.SetRange("Project Code", "Project Code");
+        TransSource.SetRange("Project Code", GetFilter("Project Code"));
         if not TransSource.IsEmpty() then
             if Confirm(DeleteWarningTxt, false, "Project Code") then begin
                 TransSource.DeleteAll();
@@ -174,22 +171,14 @@ page 78600 "BAC Trans Project List"
                 LineNo += 1;
                 LeftPart := COPYSTR(TextLine, 1, STRPOS(TextLine, ':') - 1);
                 RightPart := COPYSTR(TextLine, STRPOS(TextLine, ':') + 1);
-                //TransProject.Get("Project Code");
                 Language.Get("Source Language");
-                if StrContains(LeftPart, format(Language."Windows Language ID")) then begin
+                if LeftPart.Contains(format(Language."Windows Language ID")) then begin
                     TransSource."Line No." := LineNo;
                     TransSource."Project Code" := "Project Code";
-                    TransSource."Trans-Unit Id" := LeftPart;
-                    TransSource.Source := RightPart;
+                    TransSource."Trans-Unit Id" := CopyStr(LeftPart, 1, MaxStrLen(TransSource."Trans-Unit Id"));
+                    TransSource.Source := CopyStr(RightPart, 1, MaxStrLen(TransSource.Source));
                     TransSource.Insert();
                 end;
             end;
-    end;
-
-    local procedure StrContains(String: Text; CompareString: Text) Contains: boolean
-    begin
-        if StrPos(String, CompareString) > 0 then
-            exit(true);
-        exit(false)
     end;
 }

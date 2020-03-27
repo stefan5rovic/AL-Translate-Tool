@@ -12,7 +12,7 @@ codeunit 78600 "BAC Google Translate Rest"
         if not ResponseMessage.IsSuccessStatusCode() then
             error('The web service returned an error message:\\' + 'Status code: %1\' + 'Description: %2', ResponseMessage.HttpStatusCode(), ResponseMessage.ReasonPhrase());
         ResponseMessage.Content().ReadAs(TransText);
-        outTransText := GetLines(TransText);
+        outTransText := CopyStr(GetLines(TransText), 1, MaxStrLen(outTransText));
     end;
 
     local procedure GetLines(inTxt: Text) outTxt: Text;

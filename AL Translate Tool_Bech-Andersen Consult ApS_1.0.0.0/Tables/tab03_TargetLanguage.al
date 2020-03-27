@@ -16,7 +16,7 @@ table 78603 "BAC Target Language"
         {
             Caption = 'Project Name';
             FieldClass = FlowField;
-            CalcFormula = lookup ("BAC Translation Project Name"."Project Name" where ("Project Code" = field ("Project Code")));
+            CalcFormula = lookup ("BAC Translation Project Name"."Project Name" where("Project Code" = field("Project Code")));
             Editable = false;
         }
 
@@ -67,6 +67,11 @@ table 78603 "BAC Target Language"
         key(PK; "Project Code", "Target Language")
         {
             Clustered = true;
+        }
+
+        key(TargetLanguageISOCode; "Target Language ISO code")
+        {
+
         }
     }
 }

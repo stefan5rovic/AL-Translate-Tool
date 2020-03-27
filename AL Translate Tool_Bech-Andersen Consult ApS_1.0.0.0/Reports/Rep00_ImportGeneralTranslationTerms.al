@@ -6,6 +6,8 @@ report 78600 "ImportGeneralTranslationTerms"
     CaptionML = ENU = 'Import General Translation Terms',
                 SRM = 'Import General Translation Terms';
     ProcessingOnly = true;
+    ApplicationArea = All;
+    UsageCategory = Administration;
 
     dataset
     {
@@ -26,17 +28,18 @@ report 78600 "ImportGeneralTranslationTerms"
                     {
                         CaptionML = ENU = 'Import From',
                                     SRM = 'Uvezi iz';
-                        field(FileNameG; FileNameG)
+                        field(FileNameG; FileName)
                         {
                             CaptionML = ENU = 'Workbook File Name',
                                         SRM = 'Ime datoteke';
                             Editable = false;
+                            ApplicationArea = All;
 
                             trigger OnAssistEdit();
                             begin
                                 RequestFile();
 
-                                SheetNameG := ExcelBufferG.SelectSheetsName(ServerFileNameG);
+                                SheetName := ExcelBufferG.SelectSheetsName(ServerFileNameG);
                             end;
 
                             trigger OnValidate();
@@ -44,18 +47,19 @@ report 78600 "ImportGeneralTranslationTerms"
                                 FileNameOnAfterValidate();
                             end;
                         }
-                        field(SheetNameG; SheetNameG)
+                        field(SheetNameG; SheetName)
                         {
                             CaptionML = ENU = 'Worksheet Name',
                                         SRM = 'Ime radnog lista';
                             Editable = false;
+                            ApplicationArea = All;
 
                             trigger OnAssistEdit();
                             begin
                                 IF ServerFileNameG = '' THEN
                                     RequestFile();
 
-                                SheetNameG := ExcelBufferG.SelectSheetsName(ServerFileNameG);
+                                SheetName := ExcelBufferG.SelectSheetsName(ServerFileNameG);
                             end;
                         }
                     }
@@ -69,8 +73,8 @@ report 78600 "ImportGeneralTranslationTerms"
 
         trigger OnOpenPage();
         begin
-            FileNameG := '';
-            SheetNameG := '';
+            FileName := '';
+            SheetName := '';
         end;
     }
 
@@ -94,7 +98,7 @@ report 78600 "ImportGeneralTranslationTerms"
     begin
         ExcelBufferG.DELETEALL();
 
-        ExcelBufferG.OpenBook(ServerFileNameG, SheetNameG);
+        ExcelBufferG.OpenBook(ServerFileNameG, SheetName);
         ExcelBufferG.ReadSheet();
 
         ImportDataFromExcel();
@@ -104,8 +108,8 @@ report 78600 "ImportGeneralTranslationTerms"
         ExcelBufferG: Record "Excel Buffer" temporary;
         FileManagementG: Codeunit "File Management";
         WindowDialogG: Dialog;
-        FileNameG: Text;
-        SheetNameG: Text[250];
+        FileName: Text;
+        SheetName: Text[250];
         ServerFileNameG: Text;
         ImportExcelFileTxt: TextConst ENU = 'Import Excel File', SRM = 'Uvoz Excel datoteke';
         MustEnterFileNameErr: TextConst ENU = 'You must enter a file name.', SRM = 'Morate uneti ime fajla.';
@@ -115,14 +119,14 @@ report 78600 "ImportGeneralTranslationTerms"
 
     local procedure RequestFile();
     begin
-        IF FileNameG <> '' THEN
-            ServerFileNameG := FileManagementG.UploadFile(ImportExcelFileTxt, FileNameG)
+        IF FileName <> '' THEN
+            ServerFileNameG := FileManagementG.UploadFile(CopyStr(ImportExcelFileTxt, 1, 50), FileName)
         ELSE
-            ServerFileNameG := FileManagementG.UploadFile(ImportExcelFileTxt, '.xlsx');
+            ServerFileNameG := FileManagementG.UploadFile(CopyStr(ImportExcelFileTxt, 1, 50), '.xlsx');
 
         ValidateServerFileName();
 
-        FileNameG := FileManagementG.GetFileName(ServerFileNameG);
+        FileName := FileManagementG.GetFileName(ServerFileNameG);
     end;
 
     local procedure FileNameOnAfterValidate();
@@ -133,8 +137,8 @@ report 78600 "ImportGeneralTranslationTerms"
     local procedure ValidateServerFileName();
     begin
         IF ServerFileNameG = '' THEN BEGIN
-            FileNameG := '';
-            SheetNameG := '';
+            FileName := '';
+            SheetName := '';
             ERROR(MustEnterFileNameErr);
         END;
     end;
@@ -149,8 +153,8 @@ report 78600 "ImportGeneralTranslationTerms"
         NextUpdateTimeL: Time;
         LineNoL: Integer;
         RowNoL: Integer;
-        TermL: Text;
-        TranslationL: Text;
+        TermL: Text[250];
+        TranslationL: Text[250];
     begin
         WindowDialogG.OPEN(ProcessingDataTxt + StatusTxt);
         NextUpdateTimeL := TIME() + 1000;
@@ -166,9 +170,6 @@ report 78600 "ImportGeneralTranslationTerms"
             LineNoL := 0;
 
         ExcelBufferG.RESET();
-        //ExcelBufferG.SETRANGE("Column No.", 4);
-        //ExcelBufferG.SETFILTER("Row No.", '%1..', 2);
-        //RowNoL := 1;
 
         IF ExcelBufferG.FINDSET() THEN
             REPEAT
@@ -215,12 +216,12 @@ report 78600 "ImportGeneralTranslationTerms"
 
     end;
 
-    procedure SetTargetLanguageG(TargetLanguageP: Code[20]);
+    procedure SetTargetLanguageG(TargetLanguageP: Code[10]);
     begin
         TargetLanguageG := TargetLanguageP;
     end;
 
     var
-        TargetLanguageG: Code[20];
+        TargetLanguageG: Code[10];
 }
 

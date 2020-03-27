@@ -73,6 +73,7 @@ xmlport 78605 "BAC Import Trans Target 2018"
                             }
                             fieldattribute("maxWidth"; Target."Max Width")
                             {
+                                Occurrence = Optional;
                             }
 
                             textattribute("size-unit")

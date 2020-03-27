@@ -70,6 +70,7 @@ xmlport 78603 "BAC Import Trans. Source 2018"
                             }
                             fieldattribute("maxWidth"; Source."Max Width")
                             {
+                                Occurrence = Optional;
                             }
                             textattribute("size-unit")
                             {
