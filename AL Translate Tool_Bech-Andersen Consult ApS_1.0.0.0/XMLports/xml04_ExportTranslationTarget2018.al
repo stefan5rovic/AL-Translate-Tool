@@ -89,6 +89,14 @@ xmlport 78604 "BAC Export Trans Target 2018"
                                     translate := Target.TranslateAttr;
                                 end;
                             }
+                            textattribute("al-object-target")
+                            {
+                                Occurrence = Optional;
+                                trigger OnBeforePassVariable()
+                                begin
+                                    Target."al-object-target" := "al-object-target";
+                                end;
+                            }
                             fieldelement(Source; Target.Source)
                             {
                                 XmlName = 'source';
@@ -118,6 +126,12 @@ xmlport 78604 "BAC Export Trans Target 2018"
                             {
                                 XmlName = 'target';
                             }
+
+                            trigger OnAfterGetRecord()
+                            begin
+                                LineCounter += 1;
+                                Window.Update(1, LineCounter);
+                            end;
                         }
                     }
                 }
@@ -128,14 +142,17 @@ xmlport 78604 "BAC Export Trans Target 2018"
     var
         TransNotes: Record "BAC Translation Notes";
         TransProject: Record "BAC Translation Project Name";
+        Window: Dialog;
         ProjectCode: Code[10];
         SourceTransCode: Text[10];
         TargetTransCode: Text[10];
+        LineCounter: Integer;
 
     trigger OnPreXmlPort()
     var
         TempFile: Text;
     begin
+        Window.Open('Exporting #1####');
         TransProject.Get(target.getfilter("Project Code"));
         TempFile := TransProject."File Name";
         if StrPos(lowercase(TempFile), '.xlf') > 0 then
@@ -144,6 +161,11 @@ xmlport 78604 "BAC Export Trans Target 2018"
         if StrPos(lowercase(TempFile), '.xlif') > 0 then
             currXMLport.Filename := CopyStr(TempFile, 1, StrPos(lowercase(TempFile), '.xlif')) +
                                      Target.GetFilter("Target Language ISO code") + '.xlif';
+    end;
+
+    trigger OnPostXmlPort()
+    begin
+        Window.Close();
     end;
 
     procedure SetProjectCode(inProjectCode: Code[10]; InSourceLang: Text[10]; InTargetLang: Text[10])

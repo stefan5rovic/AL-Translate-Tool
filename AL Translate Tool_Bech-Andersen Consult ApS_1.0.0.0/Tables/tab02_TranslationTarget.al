@@ -99,6 +99,11 @@ table 78602 "BAC Translation Target"
             FieldClass = FlowField;
             CalcFormula = count ("BAC Translation Target" where(Source = field(Source)));
         }
+        field(130; "al-object-target"; Text[250])
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'al-object-target';
+        }
 
     }
 

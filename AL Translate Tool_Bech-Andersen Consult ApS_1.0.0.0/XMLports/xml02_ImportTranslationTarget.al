@@ -85,7 +85,14 @@ xmlport 78602 "BAC Import Translation Target"
                                     Target.TranslateAttr := translate;
                                 end;
                             }
-
+                            textattribute("al-object-target")
+                            {
+                                Occurrence = Optional;
+                                trigger OnAfterAssignVariable()
+                                begin
+                                    Target."al-object-target" := "al-object-target";
+                                end;
+                            }
                             fieldelement(source; Target.Source)
                             {
                             }
@@ -125,6 +132,8 @@ xmlport 78602 "BAC Import Translation Target"
 
                             trigger OnBeforeInsertRecord()
                             begin
+                                LineCounter += 1;
+                                Window.Update(1, LineCounter);
                                 if ProjectCode = '' then
                                     error(MissingProjNameTxt);
                                 Target."Project Code" := ProjectCode;
@@ -142,11 +151,23 @@ xmlport 78602 "BAC Import Translation Target"
         TransNotes: Record "BAC Translation Notes";
         TargetLanguage: Record "BAC Target Language";
         TransProject: Record "BAC Translation Project Name";
+        Window: Dialog;
         MissingProjNameTxt: Label 'Project Name is Missing';
         ProjectCode: Code[10];
         TargetLangCode: Code[10];
         TargetLangISOCode: Text[10];
         SourceLangISOCode: Text[10];
+        LineCounter: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        Window.Open('Processing line No. #1####');
+    end;
+
+    trigger OnPostXmlPort()
+    begin
+        Window.Close();
+    end;
 
     procedure SetProjectCode(inProjectCode: Code[10]; inSourceLangISOCode: text[10]; inTargetLangISOCode: Text[10])
     begin

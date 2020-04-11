@@ -359,6 +359,7 @@ page 78603 "BAC Translation Target List"
                 TransTarget.TransferFields(TransSource);
                 TransTarget."Target Language" := CopyStr(GetFilter("Target Language"), 1, MaxStrLen(TransTarget."Target Language"));
                 TransTarget."Target Language ISO code" := CopyStr(GetFilter("Target Language ISO code"), 1, MaxStrLen(TransTarget."Target Language ISO code"));
+                TransTarget."al-object-target" := TransSource."al-object-target";
                 if TransTarget.Insert() then;
             until TransSource.Next() = 0;
     end;

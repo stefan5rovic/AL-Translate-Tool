@@ -157,6 +157,7 @@ page 78600 "BAC Trans Project List"
         TextLine: Text;
         RightPart: Text;
         LeftPart: Text;
+        Skip: Boolean;
     begin
         TransSource.SetRange("Project Code", GetFilter("Project Code"));
         if not TransSource.IsEmpty() then
@@ -172,13 +173,18 @@ page 78600 "BAC Trans Project List"
                 LeftPart := COPYSTR(TextLine, 1, STRPOS(TextLine, ':') - 1);
                 RightPart := COPYSTR(TextLine, STRPOS(TextLine, ':') + 1);
                 Language.Get("Source Language");
-                if LeftPart.Contains(format(Language."Windows Language ID")) then begin
-                    TransSource."Line No." := LineNo;
-                    TransSource."Project Code" := "Project Code";
-                    TransSource."Trans-Unit Id" := CopyStr(LeftPart, 1, MaxStrLen(TransSource."Trans-Unit Id"));
-                    TransSource.Source := CopyStr(RightPart, 1, MaxStrLen(TransSource.Source));
-                    TransSource.Insert();
-                end;
+                if RightPart.Contains('{Locked}') then
+                    Skip := true;
+
+                if LeftPart.Contains(format(Language."Windows Language ID")) then
+                    if not Skip then begin
+                        TransSource."Line No." := LineNo;
+                        TransSource."Project Code" := "Project Code";
+                        TransSource."Trans-Unit Id" := CopyStr(LeftPart, 1, MaxStrLen(TransSource."Trans-Unit Id"));
+                        TransSource.Source := CopyStr(RightPart, 1, MaxStrLen(TransSource.Source));
+                        TransSource.Insert();
+                    end else
+                        Skip := false;
             end;
     end;
 }

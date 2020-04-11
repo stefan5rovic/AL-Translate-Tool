@@ -45,8 +45,10 @@ xmlport 78600 "BAC Import Translation Source"
                     end;
 
                 }
+
                 textattribute("target-language")
                 {
+                    Occurrence = Optional;
                 }
                 textattribute(original)
                 {
@@ -89,7 +91,14 @@ xmlport 78600 "BAC Import Translation Source"
                                     source.TranslateAttr := translate;
                                 end;
                             }
-
+                            textattribute("al-object-target")
+                            {
+                                Occurrence = Optional;
+                                trigger OnAfterAssignVariable()
+                                begin
+                                    Source."al-object-target" := "al-object-target";
+                                end;
+                            }
                             fieldelement(source; Source.Source)
                             {
                             }
@@ -125,6 +134,8 @@ xmlport 78600 "BAC Import Translation Source"
                             }
                             trigger OnBeforeInsertRecord()
                             begin
+                                LineCounter += 1;
+                                Window.Update(1, LineCounter);
                                 if ProjectCode = '' then
                                     error(MissingProjNameTxt);
                                 Source."Project Code" := ProjectCode;
@@ -140,12 +151,19 @@ xmlport 78600 "BAC Import Translation Source"
     var
         TransNotes: Record "BAC Translation Notes";
         TransProject: Record "BAC Translation Project Name";
-
+        Window: Dialog;
         ProjectCode: Code[10];
         MissingProjNameTxt: Label 'Project Name is Missing';
+        LineCounter: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        Window.Open('Processing line No. #1####');
+    end;
 
     trigger OnPostXmlPort()
     begin
+        Window.Close();
         with TransProject do begin
             "File Name" := CopyStr(currXMLport.Filename(), 1, MaxStrLen("File Name"));
             while (StrPos("File Name", '\') > 0) do

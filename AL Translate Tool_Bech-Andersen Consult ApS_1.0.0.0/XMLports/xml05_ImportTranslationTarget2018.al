@@ -130,6 +130,8 @@ xmlport 78605 "BAC Import Trans Target 2018"
 
                             trigger OnBeforeInsertRecord()
                             begin
+                                LineCounter += 1;
+                                Window.Update(1, LineCounter);
                                 if ProjectCode = '' then
                                     error(MissingProjNameTxt);
                                 Target."Project Code" := ProjectCode;
@@ -147,11 +149,23 @@ xmlport 78605 "BAC Import Trans Target 2018"
         TransNotes: Record "BAC Translation Notes";
         TargetLanguage: Record "BAC Target Language";
         TransProject: Record "BAC Translation Project Name";
+        Window: Dialog;
         ProjectCode: Code[10];
         TargetLangCode: Code[10];
         TargetLangISOCode: Text[10];
         SourceLangISOCode: Text[10];
         MissingProjNameTxt: Label 'Project Name is Missing';
+        LineCounter: Integer;
+
+    trigger OnPreXmlPort()
+    begin
+        Window.Open('Processing line No. #1####');
+    end;
+
+    trigger OnPostXmlPort()
+    begin
+        Window.Close();
+    end;
 
     procedure SetProjectCode(inProjectCode: Code[10]; inSourceLangISOCode: text[10]; inTargetLangISOCode: Text[10])
     begin

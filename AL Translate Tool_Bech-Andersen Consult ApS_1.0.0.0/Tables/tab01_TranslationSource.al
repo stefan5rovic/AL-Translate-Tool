@@ -47,6 +47,12 @@ table 78601 "BAC Translation Source"
             Caption = 'Max Width';
         }
 
+        field(120; "al-object-target"; Text[250])
+        {
+            DataClassification = ToBeClassified;
+            Caption = 'al-object-target';
+        }
+
     }
 
     keys
