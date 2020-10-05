@@ -109,7 +109,7 @@ report 78600 "ImportGeneralTranslationTerms"
         FileManagementG: Codeunit "File Management";
         WindowDialogG: Dialog;
         FileName: Text;
-        SheetName: Text[250];
+        SheetName: Text;
         ServerFileNameG: Text;
         ImportExcelFileTxt: TextConst ENU = 'Import Excel File', SRM = 'Uvoz Excel datoteke';
         MustEnterFileNameErr: TextConst ENU = 'You must enter a file name.', SRM = 'Morate uneti ime fajla.';
@@ -153,8 +153,8 @@ report 78600 "ImportGeneralTranslationTerms"
         NextUpdateTimeL: Time;
         LineNoL: Integer;
         RowNoL: Integer;
-        TermL: Text[250];
-        TranslationL: Text[250];
+        TermL: Text;
+        TranslationL: Text;
     begin
         WindowDialogG.OPEN(ProcessingDataTxt + StatusTxt);
         NextUpdateTimeL := TIME() + 1000;
